@@ -1,31 +1,35 @@
+import './App.css';
 
-function ToDoTable(props){
+function ToDoTable(props) {
   return (
     <tr>
       <td>
-      <label>{props.id}</label>
+        <label>{props.id}</label>
       </td>
-      <td>{props.todo}
+      <td>
+        <label>{props.toDo}</label>
+      </td>
+      <td>
+        <label><input type="checkbox" /></label>
       </td>
     </tr>
   )
 }
+
 class InputBar extends React.Component {
   constructor(props) {
     super(props);
-    this.add = this.add.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
-  add(e) {
-    this.props.onAdd(e.target.value);
+  handleChange(e) {
+    this.props.onChange(e.target.value);
   }
 
   render() {
     return (
-      <div>
-      <input type="text" placeholder="Type what you need to do..." value={this.props.todo} />
-      <button onclick={this.add}>Add</button>
-      </div>
+      <input type="text" placeholder="Type what you need to do..." 
+      value={this.props.toDo} onChange={this.handleChange} />
     )
   }
 }
@@ -33,27 +37,35 @@ class InputBar extends React.Component {
 class ToDoList extends React.Component {
   constructor(props) {
     super(props);
-    const toDoCounter = 1;
+    const toDoCounter = 0;
     this.state = {
       list: [
         {
-          id: toDoCounter,
-          todo: '',
+          id: '',
+          toDo: '',
         },
       ],
       toDoCounter: toDoCounter,
     };
   
   this.add = this.add.bind(this);
+  this.handleChange = this.handleChange.bind(this);
   }
 
-  add(todo) {
+  handleChange(toDo) {
+    this.setState( {
+          toDo: toDo,
+        }
+    )
+  }
+
+  add() {
     this.setState({
       list: [
         ...this.state.list,
         {
           id: this.state.toDoCounter +1,
-          todo: todo,
+          toDo: this.state.toDo,
         }
       ],
       toDoCounter: this.state.toDoCounter +1,
@@ -63,12 +75,18 @@ class ToDoList extends React.Component {
   render(){
     return (
       <div>
-        <InputBar todo={this.state.todo} onAdd={this.add} />
-      <table>
-      {this.state.list.map((todos,index) => (
-        <ToDoTable key={todos.id} {...todos} />
-      ))}
-      </table>
+      <h1>A Simple To-do List</h1>
+        <div>
+          <InputBar toDo={this.state.toDo} onChange={this.handleChange} />
+          <button onClick= {this.add}>Add</button>
+        </div>
+        <div>
+          <table>
+          {this.state.list.map((todos) => (
+          <ToDoTable key={todos.id} {...todos} />
+        ))}
+          </table>
+        </div>
       </div>
     );
   }
