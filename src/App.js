@@ -1,4 +1,5 @@
 import './App.css';
+import React from 'react';
 
 function ToDoTable(props) {
   return (
@@ -10,10 +11,12 @@ function ToDoTable(props) {
         <label>{props.toDo}</label>
       </td>
       <td>
-        <label><input type="checkbox" /></label>
+        <label>
+          <input type="checkbox" />
+        </label>
       </td>
     </tr>
-  )
+  );
 }
 
 class InputBar extends React.Component {
@@ -28,9 +31,13 @@ class InputBar extends React.Component {
 
   render() {
     return (
-      <input type="text" placeholder="Type what you need to do..." 
-      value={this.props.toDo} onChange={this.handleChange} />
-    )
+      <input
+        type="text"
+        placeholder="Type what you need to do..."
+        value={this.props.toDo}
+        onChange={this.handleChange}
+      />
+    );
   }
 }
 
@@ -47,16 +54,15 @@ class ToDoList extends React.Component {
       ],
       toDoCounter: toDoCounter,
     };
-  
-  this.add = this.add.bind(this);
-  this.handleChange = this.handleChange.bind(this);
+
+    this.add = this.add.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(toDo) {
-    this.setState( {
-          toDo: toDo,
-        }
-    )
+    this.setState({
+      toDo: toDo,
+    });
   }
 
   add() {
@@ -64,27 +70,27 @@ class ToDoList extends React.Component {
       list: [
         ...this.state.list,
         {
-          id: this.state.toDoCounter +1,
+          id: this.state.toDoCounter + 1,
           toDo: this.state.toDo,
-        }
+        },
       ],
-      toDoCounter: this.state.toDoCounter +1,
-    })
+      toDoCounter: this.state.toDoCounter + 1,
+    });
   }
 
-  render(){
+  render() {
     return (
       <div>
-      <h1>A Simple To-do List</h1>
+        <h1>A Simple To-do List</h1>
         <div>
           <InputBar toDo={this.state.toDo} onChange={this.handleChange} />
-          <button onClick= {this.add}>Add</button>
+          <button onClick={this.add}>Add</button>
         </div>
         <div>
           <table>
-          {this.state.list.map((todos) => (
-          <ToDoTable key={todos.id} {...todos} />
-        ))}
+            {this.state.list.map(todos => (
+              <ToDoTable key={todos.id} {...todos} />
+            ))}
           </table>
         </div>
       </div>
@@ -92,7 +98,4 @@ class ToDoList extends React.Component {
   }
 }
 
-ReactDOM.render(
-  <ToDoList />,
-  document.getElementById('root')
-);
+export default ToDoList;
