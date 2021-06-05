@@ -46,12 +46,7 @@ class ToDoList extends React.Component {
     super(props);
     const toDoCounter = 0;
     this.state = {
-      list: [
-        {
-          id: '',
-          toDo: '',
-        },
-      ],
+      list: [],
       toDoCounter: toDoCounter,
     };
 
