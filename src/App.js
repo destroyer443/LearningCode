@@ -1,16 +1,20 @@
+import React from 'react';
 import './App.css';
 
 function ToDoTable(props) {
   return (
     <tr>
       <td>
-        <label>{props.id}</label>
+        <label>{props.number}</label>
       </td>
       <td>
         <label>{props.toDo}</label>
       </td>
       <td>
         <label><input type="checkbox" /></label>
+      </td>
+      <td>
+        <label><button onClick = {props.remove}>Remove </button></label>
       </td>
     </tr>
   )
@@ -39,12 +43,7 @@ class ToDoList extends React.Component {
     super(props);
     const toDoCounter = 0;
     this.state = {
-      list: [
-        {
-          id: '',
-          toDo: '',
-        },
-      ],
+      list: [],
       toDoCounter: toDoCounter,
     };
   
@@ -57,6 +56,7 @@ class ToDoList extends React.Component {
           toDo: toDo,
         }
     )
+    console.log(this.state.toDo);
   }
 
   add() {
@@ -70,6 +70,18 @@ class ToDoList extends React.Component {
       ],
       toDoCounter: this.state.toDoCounter +1,
     })
+    this.setState({
+      toDo: '',
+    })
+    console.log(this.state.list);
+  }
+
+  remove(index) {
+    this.state.list.splice(index,1);
+    this.setState({
+      list: this.state.list,
+    })
+    console.log(this.state.list);
   }
 
   render(){
@@ -80,10 +92,12 @@ class ToDoList extends React.Component {
           <InputBar toDo={this.state.toDo} onChange={this.handleChange} />
           <button onClick= {this.add}>Add</button>
         </div>
+        <br />
         <div>
           <table>
-          {this.state.list.map((todos) => (
-          <ToDoTable key={todos.id} {...todos} />
+          {this.state.list.map((todos,index) => (
+          <ToDoTable key={todos.id} number={index+1} toDo={todos.toDo} 
+          remove= {() => this.remove(index)} />
         ))}
           </table>
         </div>
@@ -92,7 +106,4 @@ class ToDoList extends React.Component {
   }
 }
 
-ReactDOM.render(
-  <ToDoList />,
-  document.getElementById('root')
-);
+export default ToDoList;
