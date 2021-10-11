@@ -2,8 +2,16 @@ import React from "react";
 import "./App.css";
 
 class ToDoTable extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleEdit = this.handleEdit.bind(this);
+  }
+  handleEdit(e) {
+    this.props.handleEdit(e.target.value);
+  }
   render() {
-    return (
+    const isEditing = this.props.isEditing;
+    const viewTemplate = (
       <tr>
         <td>
           <label>{this.props.number}</label>
@@ -16,18 +24,67 @@ class ToDoTable extends React.Component {
             <input
               id={this.props.id}
               type="checkbox"
-              defaultChecked={this.props.completed}
+              checked={this.props.completed}
               onChange={() => this.props.handleChecked(this.props.id)}
             />
           </label>
         </td>
         <td>
-          <label>
-            <button onClick={this.props.remove}>Remove </button>
-          </label>
+          <button onClick={() => this.props.editMode(this.props.id)}>
+            Edit{" "}
+          </button>
+        </td>
+        <td>
+          <button onClick={this.props.remove}>Remove </button>
         </td>
       </tr>
     );
+
+    const editingTemplate = (
+      <tr>
+        <td>
+          <label>{this.props.number}</label>
+        </td>
+        <td>
+          <input
+            type="text"
+            placeholder="New name"
+            onChange={this.handleEdit}
+            value={this.props.newName}
+            id={this.props.id}
+          />
+        </td>
+        <td>
+          <label>
+            <input
+              id={this.props.id}
+              type="checkbox"
+              checked={this.props.completed}
+              onChange={() => this.props.handleChecked(this.props.id)}
+            />
+          </label>
+        </td>
+        <td>
+          <button
+            onClick={() =>
+              this.props.save(
+                this.props.id,
+                this.props.newName,
+                this.props.exitEditMode
+              )
+            }
+          >
+            Save
+          </button>
+        </td>
+        <td>
+          <button onClick={() => this.props.exitEditMode(this.props.id)}>
+            Cancel
+          </button>
+        </td>
+      </tr>
+    );
+    return isEditing ? editingTemplate : viewTemplate;
   }
 }
 
@@ -61,11 +118,16 @@ class ToDoList extends React.Component {
       list: [],
       toDoCounter: toDoCounter,
       toDo: "",
+      newName: "",
     };
 
     this.add = this.add.bind(this);
+    this.editMode = this.editMode.bind(this);
+    this.exitEditMode = this.exitEditMode.bind(this);
+    this.save = this.save.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleChecked = this.handleChecked.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
   }
 
   handleChange(toDo) {
@@ -80,18 +142,24 @@ class ToDoList extends React.Component {
   }
 
   handleChecked(id) {
-    this.state.list.map((todos) => {
+    const newList = this.state.list.map((todos) => {
       if (id === todos.id) {
         return { ...todos, completed: !todos.completed };
       }
       return todos;
     });
+    this.setState({ list: newList }, () => {
+      console.log(this.state.list);
+    });
+  }
+
+  handleEdit(newName) {
     this.setState(
       {
-        list: this.state.list,
+        newName: newName,
       },
       () => {
-        console.log(this.state.list);
+        console.log(this.state.newName);
       }
     );
   }
@@ -105,17 +173,56 @@ class ToDoList extends React.Component {
             id: this.state.toDoCounter + 1,
             toDo: this.state.toDo,
             completed: false,
+            isEditing: false,
           },
         ],
         toDoCounter: this.state.toDoCounter + 1,
+        toDo: "",
       },
       () => {
         console.log(this.state.list);
       }
     );
-    this.setState({
-      toDo: "",
+  }
+
+  editMode(id) {
+    const editModeList = this.state.list.map((todos) => {
+      if (id === todos.id) {
+        return { ...todos, isEditing: true };
+      }
+      return { ...todos, isEditing: false };
     });
+    this.setState({
+      list: editModeList,
+    });
+  }
+
+  exitEditMode(id) {
+    const normalList = this.state.list.map((todos) => {
+      if (id === todos.id) {
+        return { ...todos, isEditing: false };
+      }
+      return todos;
+    });
+    this.setState({
+      list: normalList,
+    });
+  }
+
+  save(id, newName) {
+    const editedList = this.state.list.map((todos) => {
+      if (id === todos.id) {
+        return { ...todos, toDo: newName, isEditing: false };
+      }
+      return todos;
+    });
+    this.setState(
+      {
+        list: editedList,
+        newName: "",
+      },
+      () => console.log(this.state.list)
+    );
   }
 
   remove(index) {
@@ -152,6 +259,12 @@ class ToDoList extends React.Component {
                   remove={() => this.remove(index)}
                   completed={todos.completed}
                   handleChecked={this.handleChecked}
+                  handleEdit={this.handleEdit}
+                  newName={this.state.newName}
+                  isEditing={todos.isEditing}
+                  editMode={this.editMode}
+                  exitEditMode={this.exitEditMode}
+                  save={this.save}
                 />
               ))}
             </tbody>
