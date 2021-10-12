@@ -66,13 +66,7 @@ class ToDoTable extends React.Component {
         </td>
         <td>
           <button
-            onClick={() =>
-              this.props.save(
-                this.props.id,
-                this.props.newName,
-                this.props.exitEditMode
-              )
-            }
+            onClick={() => this.props.save(this.props.id, this.props.newName)}
           >
             Save
           </button>
@@ -110,6 +104,20 @@ class InputBar extends React.Component {
   }
 }
 
+class FilterButton extends React.Component {
+  render() {
+    return (
+      <button
+        type="button"
+        onClick={() => this.props.handleFilter(this.props.name)}
+        aria-pressed={this.props.isPressed}
+      >
+        {this.props.name}
+      </button>
+    );
+  }
+}
+
 class ToDoList extends React.Component {
   constructor(props) {
     super(props);
@@ -119,6 +127,7 @@ class ToDoList extends React.Component {
       toDoCounter: toDoCounter,
       toDo: "",
       newName: "",
+      filter: "All",
     };
 
     this.add = this.add.bind(this);
@@ -128,6 +137,7 @@ class ToDoList extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleChecked = this.handleChecked.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
+    this.handleFilter = this.handleFilter.bind(this);
   }
 
   handleChange(toDo) {
@@ -162,6 +172,12 @@ class ToDoList extends React.Component {
         console.log(this.state.newName);
       }
     );
+  }
+
+  handleFilter(name) {
+    this.setState({
+      filter: name,
+    });
   }
 
   add() {
@@ -238,6 +254,20 @@ class ToDoList extends React.Component {
   }
 
   render() {
+    const filterMap = {
+      All: () => true,
+      Active: (todos) => !todos.completed,
+      Completed: (todos) => todos.completed,
+    };
+    const filterName = Object.keys(filterMap);
+    const filterList = filterName.map((name) => (
+      <FilterButton
+        key={name}
+        name={name}
+        handleFilter={this.handleFilter}
+        isPressed={name === this.state.filter}
+      />
+    ));
     return (
       <div>
         <h1>A Simple To-do List</h1>
@@ -246,27 +276,30 @@ class ToDoList extends React.Component {
           <button onClick={this.add}>Add</button>
         </div>
         <br />
+        <div>{filterList}</div>
         <br />
         <div>
           <table>
             <tbody>
-              {this.state.list.map((todos, index) => (
-                <ToDoTable
-                  key={todos.id}
-                  id={todos.id}
-                  number={index + 1}
-                  toDo={todos.toDo}
-                  remove={() => this.remove(index)}
-                  completed={todos.completed}
-                  handleChecked={this.handleChecked}
-                  handleEdit={this.handleEdit}
-                  newName={this.state.newName}
-                  isEditing={todos.isEditing}
-                  editMode={this.editMode}
-                  exitEditMode={this.exitEditMode}
-                  save={this.save}
-                />
-              ))}
+              {this.state.list
+                .filter(filterMap[this.state.filter])
+                .map((todos, index) => (
+                  <ToDoTable
+                    key={todos.id}
+                    id={todos.id}
+                    number={index + 1}
+                    toDo={todos.toDo}
+                    remove={() => this.remove(index)}
+                    completed={todos.completed}
+                    handleChecked={this.handleChecked}
+                    handleEdit={this.handleEdit}
+                    newName={this.state.newName}
+                    isEditing={todos.isEditing}
+                    editMode={this.editMode}
+                    exitEditMode={this.exitEditMode}
+                    save={this.save}
+                  />
+                ))}
             </tbody>
           </table>
         </div>
